@@ -1,0 +1,7 @@
+RADXA-E52C-RK3588S
+M:	FUKAUMI Naoki <naoki@radxa.com>
+S:	Maintained
+F:	board/radxa/e52c-rk3588s
+F:	include/configs/e52c-rk3588s.h
+F:	configs/rock-e52c-rk3588_defconfig
+F:	arch/arm/dts/rk3588-radxa-e52c-u-boot.dtsi

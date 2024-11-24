@@ -1,0 +1,12 @@
+if TARGET_RADXA_E52C_RK3588S
+
+config SYS_BOARD
+	default "e52c-rk3588s"
+
+config SYS_VENDOR
+	default "radxa"
+
+config SYS_CONFIG_NAME
+	default "e52c-rk3588s"
+
+endif

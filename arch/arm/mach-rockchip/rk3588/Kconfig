@@ -180,6 +180,13 @@ config TARGET_RK3588_NEU6
 	  IO board and Neu6a needs to mount on top of this IO board in order to
 	  create complete Edgeble Neural Compute Module 6B(Neu6B) IO platform.
 
+config TARGET_RADXA_E52C_RK3588S
+	bool "Radxa E52C RK3588S board"
+	select BOARD_LATE_INIT
+	help
+	  Radxa E52C is a Rockchip RK3588S based SBC (Single Board Computer)
+	  by Radxa.
+
 config TARGET_ROCK5A_RK3588
 	bool "Radxa ROCK5A RK3588 board"
 	select BOARD_LATE_INIT
@@ -395,6 +402,7 @@ source "board/hardkernel/odroid_m2/Kconfig"
 source "board/indiedroid/nova/Kconfig"
 source "board/pine64/quartzpro64-rk3588/Kconfig"
 source "board/turing/turing-rk1-rk3588/Kconfig"
+source "board/radxa/e52c-rk3588s/Kconfig"
 source "board/radxa/rock5a-rk3588s/Kconfig"
 source "board/radxa/rock5b-rk3588/Kconfig"
 source "board/radxa/rock-5-itx-rk3588/Kconfig"
