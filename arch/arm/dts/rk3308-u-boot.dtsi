@@ -122,6 +122,11 @@
 	bootph-some-ram;
 };
 
+&usb20_otg {
+	bootph-pre-ram;
+	bootph-some-ram;
+};
+
 &xin24m {
 	bootph-all;
 };
