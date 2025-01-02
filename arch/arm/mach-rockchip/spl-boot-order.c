@@ -37,6 +37,10 @@ static int spl_node_to_boot_device(int node)
 {
 	struct udevice *parent;
 
+	if (!uclass_get_device_by_of_offset(UCLASS_USB_GADGET_GENERIC,
+					    node, &parent))
+		return BOOT_DEVICE_DFU;
+
 	/*
 	 * This should eventually move into the SPL code, once SPL becomes
 	 * aware of the block-device layer.  Until then (and to avoid unneeded
