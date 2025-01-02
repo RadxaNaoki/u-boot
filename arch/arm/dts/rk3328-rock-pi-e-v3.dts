@@ -2,3 +2,15 @@
 
 /dts-v1/;
 #include "rk3328-rock-pi-e.dts"
+
+&u2phy {
+	status = "okay";
+};
+
+&u2phy_otg {
+	status = "okay";
+};
+
+&usb20_otg {
+	status = "okay";
+};
