@@ -157,6 +157,11 @@
 	bootph-all;
 };
 
+&usb_host0_xhci {
+	bootph-pre-ram;
+	bootph-some-ram;
+};
+
 &xin24m {
 	bootph-all;
 };
