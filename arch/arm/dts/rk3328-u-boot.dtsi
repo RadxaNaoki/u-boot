@@ -142,6 +142,11 @@
 	bootph-pre-ram;
 };
 
+&usb20_otg {
+	bootph-pre-sram;
+	bootph-pre-ram;
+};
+
 &vop {
 	bootph-some-ram;
 };

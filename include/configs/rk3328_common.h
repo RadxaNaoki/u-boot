@@ -25,11 +25,18 @@
 	"kernel_comp_addr_r=0x08000000\0"	\
 	"kernel_comp_size=0x2000000\0"
 
+#if defined(CONFIG_SPL_DFU) && defined(CONFIG_XPL_BUILD)
+#define CFG_EXTRA_ENV_SETTINGS				\
+	"dfu_alt_info_ram=u-boot.itb ram "		\
+	__stringify(CONFIG_SPL_LOAD_FIT_ADDRESS) " "	\
+	__stringify(CONFIG_SYS_DFU_MAX_FILE_SIZE) "\0"
+#else
 #define CFG_EXTRA_ENV_SETTINGS		\
 	"fdtfile=" CONFIG_DEFAULT_FDT_FILE "\0"	\
 	"partitions=" PARTS_DEFAULT	\
 	ENV_MEM_LAYOUT_SETTINGS		\
 	ROCKCHIP_DEVICE_SETTINGS	\
 	"boot_targets=" BOOT_TARGETS "\0"
+#endif
 
 #endif /* __CONFIG_RK3328_COMMON_H */
