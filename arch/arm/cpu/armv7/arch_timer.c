@@ -22,6 +22,8 @@ static inline u32 read_cntfrq(void)
 	asm volatile("mrc p15, 0, %0, c14, c0, 0" : "=r" (frq));
 	return frq;
 }
+#else
+#error "ARMv7 with defined CFG_SYS_HZ_CLOCK and SYS_ARCH_TIMER"
 #endif
 
 int timer_init(void)
