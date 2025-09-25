@@ -1896,6 +1896,7 @@ config BOOTP_BOOTPATH
 
 config BOOTP_VENDOREX
 	bool "Support vendor extensions from BOOTP/DHCP server"
+	depends on BROKEN
 	depends on CMD_BOOTP
 
 config BOOTP_BOOTFILESIZE
@@ -2314,6 +2315,7 @@ config CMD_BUTTON
 
 config CMD_CACHE
 	bool "icache or dcache"
+	depends on !SANDBOX
 	help
 	  Enable the "icache" and "dcache" commands
 
@@ -2429,7 +2431,7 @@ config CMD_SLEEP
 
 config CMD_MP
 	bool "support for multiprocessor commands"
-	depends on MP
+	depends on MP && !CPU
 	default y
 	help
 	  This enables commands to bringup different processors
@@ -3001,7 +3003,7 @@ config CMD_EVENT
 
 config CMD_IRQ
 	bool "irq - Show information about interrupts"
-	depends on !ARM && !MIPS && !RISCV && !SH
+	depends on !ARM && !MIPS && !RISCV && !SH && !SANDBOX
 	help
 	  This enables two commands:
 
