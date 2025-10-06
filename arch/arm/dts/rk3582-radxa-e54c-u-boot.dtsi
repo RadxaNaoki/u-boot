@@ -1,0 +1,38 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/*
+ * Copyright (c) 2025 Radxa Computer (Shenzhen) Co., Ltd.
+ */
+
+#include "rk3588s-u-boot.dtsi"
+
+/ {
+	leds-0 {
+		led-0 {
+			default-state = "on";
+		};
+
+		led-1 {
+			default-state = "on";
+		};
+
+		led-2 {
+			default-state = "on";
+		};
+
+		led-3 {
+			default-state = "on";
+		};
+	};
+};
+
+&fspim0_pins {
+	bootph-pre-ram;
+	bootph-some-ram;
+};
+
+&sfc {
+	flash@0 {
+		bootph-pre-ram;
+		bootph-some-ram;
+	};
+};
