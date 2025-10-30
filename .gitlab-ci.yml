@@ -270,7 +270,7 @@ sandbox test.py:
     - ${HOST}
   variables:
     TEST_PY_BD: "sandbox"
-    TEST_PY_EXTRA: "--timing"
+    TEST_PY_EXTRA: "--timing --capture=tee-sys --exitfirst"
   <<: *buildman_and_testpy_dfn
 
 sandbox with clang test.py:
