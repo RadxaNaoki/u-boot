@@ -335,7 +335,7 @@ bool ofnode_name_eq_unit(ofnode node, const char *name)
 int ofnode_read_u8(ofnode node, const char *propname, u8 *outp)
 {
 	const u8 *cell;
-	int len;
+	int len, off;
 
 	assert(ofnode_valid(node));
 	log_debug("%s: %s: ", __func__, propname);
@@ -343,8 +343,13 @@ int ofnode_read_u8(ofnode node, const char *propname, u8 *outp)
 	if (ofnode_is_np(node))
 		return of_read_u8(ofnode_to_np(node), propname, outp);
 
-	cell = fdt_getprop(gd->fdt_blob, ofnode_to_offset(node), propname,
-			   &len);
+	off = ofnode_to_offset(node);
+	if (off < 0) {
+		log_debug("(not valid)\n");
+		return -EINVAL;
+	}
+
+	cell = fdt_getprop(gd->fdt_blob, off, propname, &len);
 	if (!cell || len < sizeof(*cell)) {
 		log_debug("(not found)\n");
 		return -EINVAL;
@@ -366,7 +371,7 @@ u8 ofnode_read_u8_default(ofnode node, const char *propname, u8 def)
 int ofnode_read_u16(ofnode node, const char *propname, u16 *outp)
 {
 	const fdt16_t *cell;
-	int len;
+	int len, off;
 
 	assert(ofnode_valid(node));
 	log_debug("%s: %s: ", __func__, propname);
@@ -374,8 +379,13 @@ int ofnode_read_u16(ofnode node, const char *propname, u16 *outp)
 	if (ofnode_is_np(node))
 		return of_read_u16(ofnode_to_np(node), propname, outp);
 
-	cell = fdt_getprop(gd->fdt_blob, ofnode_to_offset(node), propname,
-			   &len);
+	off = ofnode_to_offset(node);
+	if (off < 0) {
+		log_debug("(not valid)\n");
+		return -EINVAL;
+	}
+
+	cell = fdt_getprop(gd->fdt_blob, off, propname, &len);
 	if (!cell || len < sizeof(*cell)) {
 		log_debug("(not found)\n");
 		return -EINVAL;
@@ -411,7 +421,7 @@ int ofnode_read_u32_index(ofnode node, const char *propname, int index,
 			  u32 *outp)
 {
 	const fdt32_t *cell;
-	int len;
+	int len, off;
 
 	assert(ofnode_valid(node));
 	log_debug("%s: %s: ", __func__, propname);
@@ -420,8 +430,13 @@ int ofnode_read_u32_index(ofnode node, const char *propname, int index,
 		return of_read_u32_index(ofnode_to_np(node), propname, index,
 					 outp);
 
-	cell = fdt_getprop(ofnode_to_fdt(node), ofnode_to_offset(node),
-			   propname, &len);
+	off = ofnode_to_offset(node);
+	if (off < 0) {
+		log_debug("(not valid)\n");
+		return -EINVAL;
+	}
+
+	cell = fdt_getprop(ofnode_to_fdt(node), off, propname, &len);
 	if (!cell) {
 		log_debug("(not found)\n");
 		return -EINVAL;
@@ -442,7 +457,7 @@ int ofnode_read_u64_index(ofnode node, const char *propname, int index,
 			  u64 *outp)
 {
 	const fdt64_t *cell;
-	int len;
+	int len, off;
 
 	assert(ofnode_valid(node));
 
@@ -450,8 +465,13 @@ int ofnode_read_u64_index(ofnode node, const char *propname, int index,
 		return of_read_u64_index(ofnode_to_np(node), propname, index,
 					 outp);
 
-	cell = fdt_getprop(ofnode_to_fdt(node), ofnode_to_offset(node),
-			   propname, &len);
+	off = ofnode_to_offset(node);
+	if (off < 0) {
+		log_debug("(not valid)\n");
+		return -EINVAL;
+	}
+
+	cell = fdt_getprop(ofnode_to_fdt(node), off, propname, &len);
 	if (!cell) {
 		log_debug("(not found)\n");
 		return -EINVAL;
@@ -488,7 +508,7 @@ int ofnode_read_s32_default(ofnode node, const char *propname, s32 def)
 int ofnode_read_u64(ofnode node, const char *propname, u64 *outp)
 {
 	const unaligned_fdt64_t *cell;
-	int len;
+	int len, off;
 
 	assert(ofnode_valid(node));
 	log_debug("%s: %s: ", __func__, propname);
@@ -496,8 +516,13 @@ int ofnode_read_u64(ofnode node, const char *propname, u64 *outp)
 	if (ofnode_is_np(node))
 		return of_read_u64(ofnode_to_np(node), propname, outp);
 
-	cell = fdt_getprop(ofnode_to_fdt(node), ofnode_to_offset(node),
-			   propname, &len);
+	off = ofnode_to_offset(node);
+	if (off < 0) {
+		log_debug("(not valid)\n");
+		return -EINVAL;
+	}
+
+	cell = fdt_getprop(ofnode_to_fdt(node), off, propname, &len);
 	if (!cell || len < sizeof(*cell)) {
 		log_debug("(not found)\n");
 		return -EINVAL;
@@ -534,7 +559,7 @@ bool ofnode_read_bool(ofnode node, const char *propname)
 const void *ofnode_read_prop(ofnode node, const char *propname, int *sizep)
 {
 	const char *val = NULL;
-	int len;
+	int len, off;
 
 	assert(ofnode_valid(node));
 	log_debug("%s: %s: ", __func__, propname);
@@ -548,8 +573,13 @@ const void *ofnode_read_prop(ofnode node, const char *propname, int *sizep)
 			len = prop->length;
 		}
 	} else {
-		val = fdt_getprop(ofnode_to_fdt(node), ofnode_to_offset(node),
-				  propname, &len);
+		off = ofnode_to_offset(node);
+		if (off < 0) {
+			log_debug("<not valid>\n");
+			return NULL;
+		}
+
+		val = fdt_getprop(ofnode_to_fdt(node), off, propname, &len);
 	}
 	if (!val) {
 		log_debug("<not found>\n");
@@ -602,8 +632,13 @@ ofnode ofnode_find_subnode(ofnode node, const char *subnode_name)
 		subnode = ofnode_find_subnode_unit(node, subnode_name);
 	} else {
 		/* special case to avoid code-size increase */
-		int ooffset = fdt_subnode_offset(ofnode_to_fdt(node),
-				ofnode_to_offset(node), subnode_name);
+		int ooffset, off;
+
+		off = ofnode_to_offset(node);
+		if (off < 0)
+			return ofnode_null();
+
+		ooffset = fdt_subnode_offset(ofnode_to_fdt(node), off, subnode_name);
 		subnode = noffset_to_ofnode(node, ooffset);
 	}
 	log_debug("%s\n", ofnode_valid(subnode) ?
@@ -642,11 +677,14 @@ int ofnode_read_u32_array(ofnode node, const char *propname,
 		return of_read_u32_array(ofnode_to_np(node), propname,
 					 out_values, sz);
 	} else {
-		int ret;
+		int ret, off;
 
-		ret = fdtdec_get_int_array(ofnode_to_fdt(node),
-					   ofnode_to_offset(node), propname,
-					   out_values, sz);
+		off = ofnode_to_offset(node);
+		if (off < 0)
+			return -EINVAL;
+
+		ret = fdtdec_get_int_array(ofnode_to_fdt(node), off,
+					   propname, out_values, sz);
 
 		/* get the error right, but space is more important in SPL */
 		if (!IS_ENABLED(CONFIG_XPL_BUILD)) {
@@ -665,48 +703,71 @@ bool ofnode_is_enabled(ofnode node)
 	if (ofnode_is_np(node)) {
 		return of_device_is_available(ofnode_to_np(node));
 	} else {
-		return fdtdec_get_is_enabled(ofnode_to_fdt(node),
-					     ofnode_to_offset(node));
+		int off = ofnode_to_offset(node);
+
+		if (off < 0)
+			return false;
+
+		return fdtdec_get_is_enabled(ofnode_to_fdt(node), off);
 	}
 }
 
 ofnode ofnode_first_subnode(ofnode node)
 {
+	int off;
+
 	assert(ofnode_valid(node));
 	if (ofnode_is_np(node))
 		return np_to_ofnode(node.np->child);
 
+	off = ofnode_to_offset(node);
+	if (off < 0)
+		return ofnode_null();
+
 	return noffset_to_ofnode(node,
-		fdt_first_subnode(ofnode_to_fdt(node), ofnode_to_offset(node)));
+		fdt_first_subnode(ofnode_to_fdt(node), off));
 }
 
 ofnode ofnode_next_subnode(ofnode node)
 {
+	int off;
+
 	assert(ofnode_valid(node));
 	if (ofnode_is_np(node))
 		return np_to_ofnode(node.np->sibling);
 
+	off = ofnode_to_offset(node);
+	if (off < 0)
+		return ofnode_null();
+
 	return noffset_to_ofnode(node,
-		fdt_next_subnode(ofnode_to_fdt(node), ofnode_to_offset(node)));
+		fdt_next_subnode(ofnode_to_fdt(node), off));
 }
 #endif /* !DM_INLINE_OFNODE */
 
 ofnode ofnode_get_parent(ofnode node)
 {
 	ofnode parent;
+	int off;
 
 	assert(ofnode_valid(node));
-	if (ofnode_is_np(node))
+	if (ofnode_is_np(node)) {
 		parent = np_to_ofnode(of_get_parent(ofnode_to_np(node)));
-	else
-		parent.of_offset = fdt_parent_offset(ofnode_to_fdt(node),
-						     ofnode_to_offset(node));
+	} else {
+		off = ofnode_to_offset(node);
+		if (off < 0)
+			return ofnode_null();
+
+		parent.of_offset = fdt_parent_offset(ofnode_to_fdt(node), off);
+	}
 
 	return parent;
 }
 
 const char *ofnode_get_name(ofnode node)
 {
+	int off;
+
 	if (!ofnode_valid(node)) {
 		dm_warn("%s node not valid\n", __func__);
 		return NULL;
@@ -715,7 +776,11 @@ const char *ofnode_get_name(ofnode node)
 	if (ofnode_is_np(node))
 		return node.np->name;
 
-	return fdt_get_name(ofnode_to_fdt(node), ofnode_to_offset(node), NULL);
+	off = ofnode_to_offset(node);
+	if (off < 0)
+		return NULL;
+
+	return fdt_get_name(ofnode_to_fdt(node), off, NULL);
 }
 
 int ofnode_get_path(ofnode node, char *buf, int buflen)
@@ -730,10 +795,13 @@ int ofnode_get_path(ofnode node, char *buf, int buflen)
 
 		return 0;
 	} else {
-		int res;
+		int off, res;
 
-		res = fdt_get_path(ofnode_to_fdt(node), ofnode_to_offset(node), buf,
-				   buflen);
+		off = ofnode_to_offset(node);
+		if (off < 0)
+			return -EINVAL;
+
+		res = fdt_get_path(ofnode_to_fdt(node), off, buf, buflen);
 		if (!res)
 			return res;
 		else if (res == -FDT_ERR_NOSPACE)
@@ -773,7 +841,7 @@ ofnode oftree_get_by_phandle(oftree tree, uint phandle)
 static fdt_addr_t __ofnode_get_addr_size_index(ofnode node, int index,
 					       fdt_size_t *size, bool translate)
 {
-	int na, ns;
+	int na, ns, off;
 
 	if (size)
 		*size = FDT_SIZE_T_NONE;
@@ -803,8 +871,13 @@ static fdt_addr_t __ofnode_get_addr_size_index(ofnode node, int index,
 		ofnode parent = ofnode_get_parent(node);
 		na = ofnode_read_simple_addr_cells(parent);
 		ns = ofnode_read_simple_size_cells(parent);
+
+		off = ofnode_to_offset(node);
+		if (off < 0)
+			return FDT_ADDR_T_NONE;
+
 		return fdtdec_get_addr_size_fixed(ofnode_to_fdt(node),
-						  ofnode_to_offset(node), "reg",
+						  off, "reg",
 						  index, na, ns, size,
 						  translate);
 	}
@@ -849,10 +922,14 @@ int ofnode_stringlist_search(ofnode node, const char *property,
 		return of_property_match_string(ofnode_to_np(node),
 						property, string);
 	} else {
-		int ret;
+		int ret, off;
+
+		off = ofnode_to_offset(node);
+		if (off < 0)
+			return -EINVAL;
 
 		ret = fdt_stringlist_search(ofnode_to_fdt(node),
-					    ofnode_to_offset(node), property,
+					    off, property,
 					    string);
 		if (ret == -FDT_ERR_NOTFOUND)
 			return -ENODATA;
@@ -870,10 +947,13 @@ int ofnode_read_string_index(ofnode node, const char *property, int index,
 		return of_property_read_string_index(ofnode_to_np(node),
 						     property, index, outp);
 	} else {
-		int len;
+		int len, off;
 
-		*outp = fdt_stringlist_get(ofnode_to_fdt(node),
-					   ofnode_to_offset(node),
+		off = ofnode_to_offset(node);
+		if (off < 0)
+			return -EINVAL;
+
+		*outp = fdt_stringlist_get(ofnode_to_fdt(node), off,
 					   property, index, &len);
 		if (len < 0)
 			return -EINVAL;
@@ -883,11 +963,17 @@ int ofnode_read_string_index(ofnode node, const char *property, int index,
 
 int ofnode_read_string_count(ofnode node, const char *property)
 {
+	int off;
+
 	if (ofnode_is_np(node)) {
 		return of_property_count_strings(ofnode_to_np(node), property);
 	} else {
+		off = ofnode_to_offset(node);
+		if (off < 0)
+			return -EINVAL;
+
 		return fdt_stringlist_count(ofnode_to_fdt(node),
-					    ofnode_to_offset(node), property);
+					    off, property);
 	}
 }
 
@@ -933,10 +1019,13 @@ ofnode ofnode_parse_phandle(ofnode node, const char *phandle_name,
 		phandle = np_to_ofnode(np);
 	} else {
 		struct fdtdec_phandle_args args;
+		int off = ofnode_to_offset(node);
+
+		if (off < 0)
+			return ofnode_null();
 
 		if (fdtdec_parse_phandle_with_args(ofnode_to_fdt(node),
-						   ofnode_to_offset(node),
-						   phandle_name, NULL,
+						   off, phandle_name, NULL,
 						   0, index, &args))
 			return ofnode_null();
 
@@ -962,10 +1051,13 @@ ofnode oftree_parse_phandle(oftree tree, ofnode node, const char *phandle_name,
 		phandle = np_to_ofnode(np);
 	} else {
 		struct fdtdec_phandle_args args;
+		int off = ofnode_to_offset(node);
+
+		if (off < 0)
+			return ofnode_null();
 
 		if (fdtdec_parse_phandle_with_args(tree.fdt,
-						   ofnode_to_offset(node),
-						   phandle_name, NULL,
+						   off, phandle_name, NULL,
 						   0, index, &args))
 			return ofnode_null();
 
@@ -1011,11 +1103,14 @@ int ofnode_parse_phandle_with_args(ofnode node, const char *list_name,
 		ofnode_from_of_phandle_args(&args, out_args);
 	} else {
 		struct fdtdec_phandle_args args;
+		int off = ofnode_to_offset(node);
 		int ret;
 
+		if (off < 0)
+			return -EINVAL;
+
 		ret = fdtdec_parse_phandle_with_args(ofnode_to_fdt(node),
-						     ofnode_to_offset(node),
-						     list_name, cells_name,
+						     off, list_name, cells_name,
 						     cell_count, index, &args);
 		if (ret)
 			return ret;
@@ -1044,11 +1139,14 @@ int oftree_parse_phandle_with_args(oftree tree, ofnode node, const char *list_na
 		ofnode_from_of_phandle_args(&args, out_args);
 	} else {
 		struct fdtdec_phandle_args args;
+		int off = ofnode_to_offset(node);
 		int ret;
 
+		if (off < 0)
+			return -EINVAL;
+
 		ret = fdtdec_parse_phandle_with_args(tree.fdt,
-						     ofnode_to_offset(node),
-						     list_name, cells_name,
+						     off, list_name, cells_name,
 						     cell_count, index, &args);
 		if (ret)
 			return ret;
@@ -1061,25 +1159,37 @@ int oftree_parse_phandle_with_args(oftree tree, ofnode node, const char *list_na
 int ofnode_count_phandle_with_args(ofnode node, const char *list_name,
 				   const char *cells_name, int cell_count)
 {
-	if (ofnode_is_np(node))
+	if (ofnode_is_np(node)) {
 		return of_count_phandle_with_args(ofnode_to_np(node),
 				list_name, cells_name, cell_count);
-	else
+	} else {
+		int off = ofnode_to_offset(node);
+
+		if (off < 0)
+			return -EINVAL;
+
 		return fdtdec_parse_phandle_with_args(ofnode_to_fdt(node),
-				ofnode_to_offset(node), list_name, cells_name,
+				off, list_name, cells_name,
 				cell_count, -1, NULL);
+	}
 }
 
 int oftree_count_phandle_with_args(oftree tree, ofnode node, const char *list_name,
 				   const char *cells_name, int cell_count)
 {
-	if (ofnode_is_np(node))
+	if (ofnode_is_np(node)) {
 		return of_root_count_phandle_with_args(tree.np, ofnode_to_np(node),
 				list_name, cells_name, cell_count);
-	else
+	} else {
+		int off = ofnode_to_offset(node);
+
+		if (off < 0)
+			return -EINVAL;
+
 		return fdtdec_parse_phandle_with_args(tree.fdt,
-				ofnode_to_offset(node), list_name, cells_name,
+				off, list_name, cells_name,
 				cell_count, -1, NULL);
+	}
 }
 
 ofnode ofnode_path(const char *path)
@@ -1326,11 +1436,16 @@ int ofnode_decode_panel_timing(ofnode parent,
 
 const void *ofnode_get_property(ofnode node, const char *propname, int *lenp)
 {
-	if (ofnode_is_np(node))
+	if (ofnode_is_np(node)) {
 		return of_get_property(ofnode_to_np(node), propname, lenp);
-	else
-		return fdt_getprop(ofnode_to_fdt(node), ofnode_to_offset(node),
-				   propname, lenp);
+	} else {
+		int off = ofnode_to_offset(node);
+
+		if (off < 0)
+			return NULL;
+
+		return fdt_getprop(ofnode_to_fdt(node), off, propname, lenp);
+	}
 }
 
 bool ofnode_has_property(ofnode node, const char *propname)
@@ -1350,9 +1465,13 @@ int ofnode_first_property(ofnode node, struct ofprop *prop)
 		if (!prop->prop)
 			return -FDT_ERR_NOTFOUND;
 	} else {
+		int off = ofnode_to_offset(prop->node);
+
+		if (off < 0)
+			return -EINVAL;
+
 		prop->offset =
-			fdt_first_property_offset(ofnode_to_fdt(node),
-						  ofnode_to_offset(prop->node));
+			fdt_first_property_offset(ofnode_to_fdt(node), off);
 		if (prop->offset < 0)
 			return prop->offset;
 	}
@@ -1410,9 +1529,13 @@ fdt_addr_t ofnode_get_addr_size(ofnode node, const char *property,
 		else
 			return of_read_number(prop, na);
 	} else {
+		int off = ofnode_to_offset(node);
+
+		if (off < 0)
+			return FDT_ADDR_T_NONE;
+
 		return fdtdec_get_addr_size(ofnode_to_fdt(node),
-					    ofnode_to_offset(node), property,
-					    sizep);
+					    off, property, sizep);
 	}
 }
 
@@ -1429,8 +1552,13 @@ const uint8_t *ofnode_read_u8_array_ptr(ofnode node, const char *propname,
 		return (uint8_t *)prop;
 
 	} else {
+		int off = ofnode_to_offset(node);
+
+		if (off < 0)
+			return NULL;
+
 		return fdtdec_locate_byte_array(ofnode_to_fdt(node),
-				ofnode_to_offset(node), propname, sz);
+						off, propname, sz);
 	}
 }
 
@@ -1570,8 +1698,12 @@ int ofnode_read_addr_cells(ofnode node)
 	if (ofnode_is_np(node)) {
 		return of_n_addr_cells(ofnode_to_np(node));
 	} else {
-		int parent = fdt_parent_offset(ofnode_to_fdt(node),
-					       ofnode_to_offset(node));
+		int parent, off = ofnode_to_offset(node);
+
+		if (off < 0)
+			return -EINVAL;
+
+		parent = fdt_parent_offset(ofnode_to_fdt(node), off);
 
 		return fdt_address_cells(ofnode_to_fdt(node), parent);
 	}
@@ -1582,8 +1714,12 @@ int ofnode_read_size_cells(ofnode node)
 	if (ofnode_is_np(node)) {
 		return of_n_size_cells(ofnode_to_np(node));
 	} else {
-		int parent = fdt_parent_offset(ofnode_to_fdt(node),
-					       ofnode_to_offset(node));
+		int parent, off = ofnode_to_offset(node);
+
+		if (off < 0)
+			return -EINVAL;
+
+		parent = fdt_parent_offset(ofnode_to_fdt(node), off);
 
 		return fdt_size_cells(ofnode_to_fdt(node), parent);
 	}
@@ -1591,20 +1727,30 @@ int ofnode_read_size_cells(ofnode node)
 
 int ofnode_read_simple_addr_cells(ofnode node)
 {
-	if (ofnode_is_np(node))
+	if (ofnode_is_np(node)) {
 		return of_simple_addr_cells(ofnode_to_np(node));
-	else
-		return fdt_address_cells(ofnode_to_fdt(node),
-					 ofnode_to_offset(node));
+	} else {
+		int off = ofnode_to_offset(node);
+
+		if (off < 0)
+			return -EINVAL;
+
+		return fdt_address_cells(ofnode_to_fdt(node), off);
+	}
 }
 
 int ofnode_read_simple_size_cells(ofnode node)
 {
-	if (ofnode_is_np(node))
+	if (ofnode_is_np(node)) {
 		return of_simple_size_cells(ofnode_to_np(node));
-	else
-		return fdt_size_cells(ofnode_to_fdt(node),
-				      ofnode_to_offset(node));
+	} else {
+		int off = ofnode_to_offset(node);
+
+		if (off < 0)
+			return -EINVAL;
+
+		return fdt_size_cells(ofnode_to_fdt(node), off);
+	}
 }
 
 bool ofnode_pre_reloc(ofnode node)
@@ -1639,10 +1785,13 @@ int ofnode_read_resource(ofnode node, uint index, struct resource *res)
 		return of_address_to_resource(ofnode_to_np(node), index, res);
 	} else {
 		struct fdt_resource fres;
+		int off = ofnode_to_offset(node);
 		int ret;
 
-		ret = fdt_get_resource(ofnode_to_fdt(node),
-				       ofnode_to_offset(node),
+		if (off < 0)
+			return -EINVAL;
+
+		ret = fdt_get_resource(ofnode_to_fdt(node), off,
 				       "reg", index, &fres);
 		if (ret < 0)
 			return -EINVAL;
@@ -1668,41 +1817,61 @@ int ofnode_read_resource_byname(ofnode node, const char *name,
 
 u64 ofnode_translate_address(ofnode node, const fdt32_t *in_addr)
 {
-	if (ofnode_is_np(node))
+	if (ofnode_is_np(node)) {
 		return of_translate_address(ofnode_to_np(node), in_addr);
-	else
-		return fdt_translate_address(ofnode_to_fdt(node),
-					     ofnode_to_offset(node), in_addr);
+	} else {
+		int off = ofnode_to_offset(node);
+
+		if (off < 0)
+			return OF_BAD_ADDR;
+
+		return fdt_translate_address(ofnode_to_fdt(node), off, in_addr);
+	}
 }
 
 u64 ofnode_translate_dma_address(ofnode node, const fdt32_t *in_addr)
 {
-	if (ofnode_is_np(node))
+	if (ofnode_is_np(node)) {
 		return of_translate_dma_address(ofnode_to_np(node), in_addr);
-	else
-		return fdt_translate_dma_address(ofnode_to_fdt(node),
-						 ofnode_to_offset(node), in_addr);
+	} else {
+		int off = ofnode_to_offset(node);
+
+		if (off < 0)
+			return OF_BAD_ADDR;
+
+		return fdt_translate_dma_address(ofnode_to_fdt(node), off, in_addr);
+	}
 }
 
 int ofnode_get_dma_range(ofnode node, phys_addr_t *cpu, dma_addr_t *bus, u64 *size)
 {
-	if (ofnode_is_np(node))
+	if (ofnode_is_np(node)) {
 		return of_get_dma_range(ofnode_to_np(node), cpu, bus, size);
-	else
-		return fdt_get_dma_range(ofnode_to_fdt(node),
-					 ofnode_to_offset(node),
+	} else {
+		int off = ofnode_to_offset(node);
+
+		if (off < 0)
+			return -EINVAL;
+
+		return fdt_get_dma_range(ofnode_to_fdt(node), off,
 					 cpu, bus, size);
+	}
 }
 
 int ofnode_device_is_compatible(ofnode node, const char *compat)
 {
-	if (ofnode_is_np(node))
+	if (ofnode_is_np(node)) {
 		return of_device_is_compatible(ofnode_to_np(node), compat,
 					       NULL, NULL);
-	else
-		return !fdt_node_check_compatible(ofnode_to_fdt(node),
-						  ofnode_to_offset(node),
+	} else {
+		int off = ofnode_to_offset(node);
+
+		if (off < 0)
+			return 0;
+
+		return !fdt_node_check_compatible(ofnode_to_fdt(node), off,
 						  compat);
+	}
 }
 
 ofnode ofnode_by_compatible(ofnode from, const char *compat)
@@ -1753,7 +1922,12 @@ int ofnode_write_prop(ofnode node, const char *propname, const void *value,
 			free(newval);
 		return ret;
 	} else {
-		ret = fdt_setprop(ofnode_to_fdt(node), ofnode_to_offset(node),
+		int off = ofnode_to_offset(node);
+
+		if (off < 0)
+			return -EINVAL;
+
+		ret = fdt_setprop(ofnode_to_fdt(node), off,
 				  propname, value, len);
 		if (ret)
 			return ret == -FDT_ERR_NOSPACE ? -ENOSPC : -EINVAL;
@@ -1821,8 +1995,12 @@ int ofnode_delete_prop(ofnode node, const char *propname)
 			return of_remove_property(ofnode_to_np(node), prop);
 		return 0;
 	} else {
-		return fdt_delprop(ofnode_to_fdt(node), ofnode_to_offset(node),
-				   propname);
+		int off = ofnode_to_offset(node);
+
+		if (off < 0)
+			return -EINVAL;
+
+		return fdt_delprop(ofnode_to_fdt(node), off, propname);
 	}
 }
 
@@ -2040,6 +2218,9 @@ int ofnode_add_subnode(ofnode node, const char *name, ofnode *subnodep)
 		int poffset = ofnode_to_offset(node);
 		int offset;
 
+		if (poffset < 0)
+			return -FDT_ERR_NOTFOUND;
+
 		offset = fdt_add_subnode(fdt, poffset, name);
 		if (offset == -FDT_ERR_EXISTS) {
 			offset = fdt_subnode_offset(fdt, poffset, name);
@@ -2066,6 +2247,9 @@ int ofnode_delete(ofnode *nodep)
 	} else {
 		void *fdt = ofnode_to_fdt(node);
 		int offset = ofnode_to_offset(node);
+
+		if (offset < 0)
+			return -EINVAL;
 
 		ret = fdt_del_node(fdt, offset);
 		if (ret)
