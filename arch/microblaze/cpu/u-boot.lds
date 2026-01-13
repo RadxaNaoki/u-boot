@@ -70,5 +70,6 @@ SECTIONS
 		. = ALIGN(4);
 		__bss_end = .;
 	}
+	. = ALIGN(8);
 	_end = . ;
 }
