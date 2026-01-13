@@ -52,6 +52,7 @@ SECTIONS
 	__u_boot_list : {
 		. = ALIGN(8);
 		KEEP(*(SORT(__u_boot_list*)));
+		. = ALIGN(8);
 	} >.sram
 
 	. = ALIGN(8);

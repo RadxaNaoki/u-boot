@@ -27,6 +27,7 @@ SECTIONS
 		*(_u_boot_sandbox_getopt_end)
 	}
 
+	. = ALIGN(8);
 	_image_binary_end = .;
 }
 

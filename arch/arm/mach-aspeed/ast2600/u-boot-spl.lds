@@ -59,6 +59,7 @@ SECTIONS
 		__rel_dyn_start = .;
 		*(.rel*)
 		__rel_dyn_end = .;
+		. = ALIGN(8);
 	} > .nor
 
 	_end = .;

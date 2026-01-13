@@ -27,12 +27,14 @@ SECTIONS
 	.data : {
 		*(SORT_BY_ALIGNMENT(.data*))
 		*(SORT_BY_ALIGNMENT(.sdata*))
+		. = ALIGN(8);
 	} > .spl_mem
 
 #if defined(CONFIG_SPL_DM) || defined(CONFIG_SPL_LOADER_SUPPORT)
 	. = ALIGN(4);
 	__u_boot_list : {
 		KEEP(*(SORT(__u_boot_list*)));
+		. = ALIGN(8);
 	} > .spl_mem
 #endif
 
