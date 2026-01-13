@@ -38,7 +38,6 @@ SECTIONS
 		. = ALIGN(8);
 	} >.sram
 
-	. = ALIGN(8);
 	__image_copy_end = .;
 	_end = .;
 	_image_binary_end = .;
